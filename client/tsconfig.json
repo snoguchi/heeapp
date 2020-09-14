@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "ES5",
+    "lib": ["dom"],
+
+    "jsx": "react",
+    "rootDir": "./src",
+    "moduleResolution": "node",
+
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "paths": {
+      "shared/*": ["../dist/shared/*"]
+    }
+  },
+  "references": [{ "path": "../shared" }]
+}

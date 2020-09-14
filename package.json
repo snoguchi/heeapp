@@ -1,0 +1,57 @@
+{
+  "name": "heeapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:client": "webpack-dev-server --config client/webpack.config.js --open",
+    "build:client": "webpack --config client/webpack.config.js",
+    "dev:server": "ts-node-dev --project server/tsconfig.json server/src/index.ts",
+    "build:server": "tsc -b server/tsconfig.json",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "build": "npm run clean && npm run build:server && npm run build:client",
+    "start": "node dist/server/index.js",
+    "clean": "rimraf dist",
+    "format": "prettier --write \"{client,server,shared}/**/*.{ts,tsx,json}\"",
+    "heroku-postbuild": "npm run build"
+  },
+  "keywords": [],
+  "author": "Shinsuke Noguchi <shinsuke.noguchi@gmail.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@reduxjs/toolkit": "^1.4.0",
+    "copy-to-clipboard": "^3.3.1",
+    "express": "^4.17.1",
+    "nanoid": "^3.1.12",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-redux": "^7.2.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/nanoid": "^2.1.0",
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-redux": "^7.1.9",
+    "@types/socket.io": "^2.1.11",
+    "concurrently": "^5.3.0",
+    "copy-webpack-plugin": "^6.1.0",
+    "prettier": "^2.1.1",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^8.0.3",
+    "ts-node": "^9.0.0",
+    "ts-node-dev": "^1.0.0-pre.62",
+    "typescript": "^4.0.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true,
+    "jsxSingleQuote": true
+  }
+}
