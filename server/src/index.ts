@@ -6,7 +6,7 @@ const express = require('express');
 const { nanoid } = require('nanoid');
 const socketio = require('socket.io');
 
-import { Room, JoinRoomRequest, SendEmotionRequest, RoomResponse } from 'shared/api-interfaces';
+import { Room, CreateRoom, JoinRoom, AddEmotion, SendEmotion, RemoveEmotion } from 'shared/api-interfaces';
 
 import defaultEmotions from './default-emotions';
 
@@ -32,15 +32,15 @@ app.get('/room/:roomId', (req, res) => {
 io.on('connection', (socket) => {
   let room: Room = null;
 
-  socket.on('create', (callback: Callback<RoomResponse>) => {
+  socket.on('create-room', (callback: Callback<CreateRoom.ResponseParam>) => {
     if (room !== null) {
-      return callback({ error: 'Already in room' });
+      return callback({ error: 'NotAllowed' });
     }
 
     const roomId = nanoid();
 
     if (roomMap.has(roomId)) {
-      return callback({ error: 'Already exists' });
+      return callback({ error: 'UnexpectedError' });
     }
 
     room = {
@@ -56,19 +56,19 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('join', (param: JoinRoomRequest, callback: Callback<RoomResponse>) => {
+  socket.on('join-room', (param: JoinRoom.RequestParam, callback: Callback<JoinRoom.ResponseParam>) => {
     const { roomId } = param;
 
     if (!roomId) {
-      return callback({ error: 'Invalid parameter' });
+      return callback({ error: 'InvalidParameter' });
     }
 
     if (!roomMap.has(roomId)) {
-      return callback({ error: 'No room found' });
+      return callback({ error: 'NoRoomFound' });
     }
 
     if (room !== null) {
-      return callback({ error: 'Already in room' });
+      return callback({ error: 'NotAllowed' });
     }
 
     room = roomMap.get(roomId);
@@ -77,28 +77,77 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('leave', (callback: Callback<RoomResponse>) => {
-    if (room === null) {
-      return callback({ error: 'You are not in room' });
+  socket.on('add-emotion', (param: AddEmotion.RequestParam, callback: Callback<AddEmotion.ResponseParam>) => {
+    const { label, soundUrl, feverSoundUrl } = param;
+
+    if (!label || !soundUrl) {
+      return callback({ error: 'InvalidParameter' });
     }
 
-    socket.leave(room.roomId, () => {
-      room = null;
-      callback({ error: null, room });
+    if (room === null) {
+      return callback({ error: 'NotAllowed' });
+    }
+
+    const emotionId = 'emo:' + nanoid();
+    const createdBy = socket.id;
+
+    room.emotions.push({
+      emotionId,
+      createdBy,
+      label,
+      soundUrl,
+      total: 0,
+      fever: 0,
+      feverEndAt: 0,
+      feverSoundUrl,
     });
+
+    callback({ error: null, room });
+    socket.to(room.roomId).emit('room-update', { room });
   });
 
-  socket.on('emotion', (param: SendEmotionRequest, callback: Callback<RoomResponse>) => {
+  socket.on('remove-emotion', (param: RemoveEmotion.RequestParam, callback: Callback<RemoveEmotion.ResponseParam>) => {
     const { emotionId } = param;
 
-    if (!emotionId || room === null) {
-      return callback({ error: 'Invalid parameter' });
+    if (!emotionId) {
+      return callback({ error: 'InvalidParameter' });
+    }
+
+    if (room === null) {
+      return callback({ error: 'NotAllowed' });
     }
 
     const emotion = room.emotions.find((emotion) => emotion.emotionId === emotionId);
 
     if (!emotion) {
-      return callback({ error: 'No emotion found' });
+      return callback({ error: 'NoEmotionFound' });
+    }
+
+    if (emotion.createdBy !== socket.id) {
+      return callback({ error: 'NotAllowed' });
+    }
+
+    room.emotions = room.emotions.filter((emotion) => emotion.emotionId !== emotionId);
+
+    callback({ error: null, room });
+    socket.to(room.roomId).emit('room-update', { room });
+  });
+
+  socket.on('send-emotion', (param: SendEmotion.RequestParam, callback: Callback<SendEmotion.ResponseParam>) => {
+    const { emotionId } = param;
+
+    if (!emotionId) {
+      return callback({ error: 'InvalidParameter' });
+    }
+
+    if (room === null) {
+      return callback({ error: 'NotAllowed' });
+    }
+
+    const emotion = room.emotions.find((emotion) => emotion.emotionId === emotionId);
+
+    if (!emotion) {
+      return callback({ error: 'NoEmotionFound' });
     }
 
     emotion.total++;
@@ -112,7 +161,7 @@ io.on('connection', (socket) => {
     emotion.feverEndAt = now + 10 * 1000;
 
     callback({ error: null, room });
-    socket.to(room.roomId).emit('update', room);
+    socket.to(room.roomId).emit('room-update', { room });
   });
 });
 

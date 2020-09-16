@@ -1,31 +1,30 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
-
 import { useSelector } from '../store';
-
 import { useDispatch } from 'react-redux';
-import { sendEmotion } from '../store/room';
+import { sendEmotion, removeEmotion } from '../store/room';
+import { IconButton, Card, CardActionArea, CardContent, LinearProgress, Typography } from '@material-ui/core';
+import { Close } from '@material-ui/icons';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 
-import { Card, CardActionArea, CardContent, LinearProgress, Typography } from '@material-ui/core';
-
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-
-import { Emotion } from 'shared/api-interfaces';
-
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
-      margin: theme.spacing(1),
-      padding: 0,
-      width: theme.spacing(24),
+      position: 'relative',
+    },
+    actions: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      zIndex: 10,
     },
   })
 );
 
-export default function EmotionTile(emotion: Emotion) {
+export default function EmotionTile({ emotion, mine }) {
   const dispatch = useDispatch();
-  const classes = useStyles();
   const config = useSelector((state) => state.config);
+  const classes = useStyles();
 
   const [fever, setFever] = useState(0);
   useEffect(() => {
@@ -48,9 +47,22 @@ export default function EmotionTile(emotion: Emotion) {
     }
   }, [emotion.total]);
 
+  function handleSendEmotion() {
+    dispatch(sendEmotion({ emotionId: emotion.emotionId }));
+  }
+
+  function handleRemoveEmotion() {
+    dispatch(removeEmotion({ emotionId: emotion.emotionId }));
+  }
+
   return (
     <Card className={classes.root}>
-      <CardActionArea onClick={() => dispatch(sendEmotion({ emotionId: emotion.emotionId }))}>
+      {mine && (
+        <IconButton className={classes.actions} onClick={handleRemoveEmotion}>
+          <Close />
+        </IconButton>
+      )}
+      <CardActionArea onClick={handleSendEmotion}>
         <CardContent>
           <Typography variant='h1' align='center'>
             {emotion.total}

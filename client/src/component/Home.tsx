@@ -1,13 +1,9 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-
 import { useSelector } from '../store';
-
 import { useDispatch } from 'react-redux';
 import { createRoom } from '../store/room';
-
 import { Button, Container } from '@material-ui/core';
-
 import Header from './Header';
 
 export default function Home() {
@@ -24,7 +20,7 @@ export default function Home() {
     <Container disableGutters={true}>
       <Header />
       <Button variant='contained' color='primary' onClick={() => dispatch(createRoom())}>
-        Create Hee Room
+        へぇボタンをつくる
       </Button>
     </Container>
   );

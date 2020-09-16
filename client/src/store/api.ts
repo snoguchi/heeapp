@@ -1,10 +1,13 @@
 import * as io from 'socket.io-client';
-import { Room, JoinRoomRequest, SendEmotionRequest, RoomResponse } from 'shared/api-interfaces';
+import { CreateRoom, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion, RoomUpdate } from 'shared/api-interfaces';
 
 class SocketClient {
   private socket;
   constructor() {
     this.socket = io();
+  }
+  get clientId() {
+    return this.socket.id;
   }
   private async emit<T>(...args): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -17,20 +20,26 @@ class SocketClient {
       });
     });
   }
-  async createRoom(): Promise<RoomResponse> {
-    return this.emit<RoomResponse>('create');
+  async createRoom(): Promise<CreateRoom.ResponseParam> {
+    return this.emit<CreateRoom.ResponseParam>('create-room');
   }
-  async joinRoom(req: JoinRoomRequest): Promise<RoomResponse> {
-    return this.emit<RoomResponse>('join', req);
+  async joinRoom(req: JoinRoom.RequestParam): Promise<JoinRoom.ResponseParam> {
+    return this.emit<JoinRoom.ResponseParam>('join-room', req);
   }
-  async leaveRoom(): Promise<RoomResponse> {
-    return this.emit<RoomResponse>('leave');
+  async addEmotion(req: AddEmotion.RequestParam): Promise<AddEmotion.ResponseParam> {
+    return this.emit<AddEmotion.ResponseParam>('add-emotion', req);
   }
-  async emotion(req: SendEmotionRequest): Promise<RoomResponse> {
-    return this.emit<RoomResponse>('emotion', req);
+  async removeEmotion(req: RemoveEmotion.RequestParam): Promise<RemoveEmotion.ResponseParam> {
+    return this.emit<RemoveEmotion.ResponseParam>('remove-emotion', req);
   }
-  onUpdate(listener: (room: Room) => void) {
-    this.socket.on('update', listener);
+  async sendEmotion(req: SendEmotion.RequestParam): Promise<SendEmotion.ResponseParam> {
+    return this.emit<SendEmotion.ResponseParam>('send-emotion', req);
+  }
+  onRoomUpdate(listener: (room: RoomUpdate.NotifyParam) => void) {
+    this.socket.on('room-update', listener);
+  }
+  onDisconnect(listener: (reason: string) => void) {
+    this.socket.on('disconnect', listener);
   }
 }
 

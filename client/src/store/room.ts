@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Room, JoinRoomRequest, SendEmotionRequest } from 'shared/api-interfaces';
+import { Room, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion } from 'shared/api-interfaces';
 import api from './api';
 
 const createRoom = createAsyncThunk<Room>(
@@ -10,37 +10,45 @@ const createRoom = createAsyncThunk<Room>(
   }
 );
 
-const joinRoom = createAsyncThunk<Room, JoinRoomRequest>(
+const joinRoom = createAsyncThunk<Room, JoinRoom.RequestParam>(
   'joinRoom',
-  async (req: JoinRoomRequest): Promise<Room> => {
+  async (req: JoinRoom.RequestParam): Promise<Room> => {
     const res = await api.joinRoom(req);
     return res.room;
   }
 );
 
-const leaveRoom = createAsyncThunk<Room>(
-  'leaveRoom',
-  async (): Promise<Room> => {
-    const res = await api.leaveRoom();
+const addEmotion = createAsyncThunk<Room, AddEmotion.RequestParam>(
+  'addEmotion',
+  async (req: AddEmotion.RequestParam): Promise<Room> => {
+    const res = await api.addEmotion(req);
     return res.room;
   }
 );
 
-const sendEmotion = createAsyncThunk<Room, SendEmotionRequest>(
-  'emotion',
-  async (req: SendEmotionRequest): Promise<Room> => {
-    const res = await api.emotion(req);
+const removeEmotion = createAsyncThunk<Room, RemoveEmotion.RequestParam>(
+  'removeEmotion',
+  async (req: RemoveEmotion.RequestParam): Promise<Room> => {
+    const res = await api.removeEmotion(req);
     return res.room;
   }
 );
 
-export { createRoom, joinRoom, leaveRoom, sendEmotion };
+const sendEmotion = createAsyncThunk<Room, SendEmotion.RequestParam>(
+  'sendEmotion',
+  async (req: SendEmotion.RequestParam): Promise<Room> => {
+    const res = await api.sendEmotion(req);
+    return res.room;
+  }
+);
+
+export { createRoom, joinRoom, addEmotion, removeEmotion, sendEmotion };
 
 const slice = createSlice({
   name: 'room',
   initialState: null,
   reducers: {
-    update: (state, action) => {
+    update: (state, action: { payload: Room }) => {
       return { ...action.payload };
     },
   },
@@ -51,8 +59,11 @@ const slice = createSlice({
     builder.addCase(joinRoom.fulfilled, (state, action) => {
       return { ...action.payload };
     });
-    builder.addCase(leaveRoom.fulfilled, (state, action) => {
-      return null;
+    builder.addCase(addEmotion.fulfilled, (state, action) => {
+      return { ...action.payload };
+    });
+    builder.addCase(removeEmotion.fulfilled, (state, action) => {
+      return { ...action.payload };
     });
     builder.addCase(sendEmotion.fulfilled, (state, action) => {
       return { ...action.payload };
