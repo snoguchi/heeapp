@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Room, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion } from 'shared/api-interfaces';
-import api from './api';
+import api from '../lib/api';
 
 const createRoom = createAsyncThunk<Room>(
   'createRoom',
@@ -44,33 +44,33 @@ const sendEmotion = createAsyncThunk<Room, SendEmotion.RequestParam>(
 
 export { createRoom, joinRoom, addEmotion, removeEmotion, sendEmotion };
 
+interface RoomState extends Room {
+  error: string | null;
+}
+
 const slice = createSlice({
   name: 'room',
   initialState: null,
   reducers: {
-    update: (state, action: { payload: Room }) => {
-      return { ...action.payload };
+    updateRoom: (state: RoomState, action: PayloadAction<Room>) => {
+      return { ...state, ...action.payload };
+    },
+    raiseRoomError: (state: RoomState, action: PayloadAction<string | null>) => {
+      return { ...state, error: action.payload };
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(createRoom.fulfilled, (state, action) => {
-      return { ...action.payload };
-    });
-    builder.addCase(joinRoom.fulfilled, (state, action) => {
-      return { ...action.payload };
-    });
-    builder.addCase(addEmotion.fulfilled, (state, action) => {
-      return { ...action.payload };
-    });
-    builder.addCase(removeEmotion.fulfilled, (state, action) => {
-      return { ...action.payload };
-    });
-    builder.addCase(sendEmotion.fulfilled, (state, action) => {
-      return { ...action.payload };
+    [createRoom, joinRoom, addEmotion, removeEmotion, sendEmotion].forEach((thunk) => {
+      builder.addCase(thunk.fulfilled, (state: RoomState, action: PayloadAction<Room>) => {
+        return { error: null, ...action.payload };
+      });
+      builder.addCase(thunk.rejected, (state: RoomState, action) => {
+        return { ...state, error: action.error.message };
+      });
     });
   },
 });
 
-export const { update } = slice.actions;
+export const { updateRoom, raiseRoomError } = slice.actions;
 
 export default slice.reducer;

@@ -12,6 +12,7 @@ export interface Emotion {
 export interface Room {
   roomId: string;
   createdAt: number;
+  numberOfActiveConnections: number;
   emotions: Emotion[];
 }
 

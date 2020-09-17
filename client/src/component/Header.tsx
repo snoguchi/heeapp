@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Link, Toolbar, Typography } from '@material-ui/core';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      flexGrow: 1,
+      marginBottom: theme.spacing(3),
     },
     title: {
       flexGrow: 1,
@@ -17,7 +17,7 @@ export default function Header(props) {
   const classes = useStyles();
 
   return (
-    <Toolbar>
+    <Toolbar className={classes.root}>
       <Typography variant='h5' className={classes.title}>
         <Link href='/' color='inherit'>
           HeeApp

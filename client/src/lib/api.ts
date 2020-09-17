@@ -13,7 +13,7 @@ class SocketClient {
     return new Promise((resolve, reject) => {
       this.socket.emit(...args, (response) => {
         if (response.error) {
-          reject(response);
+          reject(new Error(response.error));
         } else {
           resolve(response);
         }

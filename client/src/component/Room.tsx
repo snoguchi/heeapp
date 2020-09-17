@@ -1,45 +1,58 @@
 import * as React from 'react';
-import { useEffect } from 'react';
 import { useSelector } from '../store';
-import { joinRoom, update } from '../store/room';
-import { useDispatch } from 'react-redux';
-import { Container } from '@material-ui/core';
+import { Box, Container, Typography } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import Header from './Header';
+import MuteButton from './button/MuteButton';
+import ShareButton from './button/ShareButton';
+import PopoutButton from './button/PopoutButton';
 import TileContainer from './TileContainer';
-import RoomCommands from './RoomCommands';
 import EmotionTile from './EmotionTile';
 import EmotionAdder from './EmotionAdder';
-import api from '../store/api';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: 'flex',
+      minHeight: '100vh',
+      flexDirection: 'column',
+    },
+    body: {
+      flex: 1,
+    },
+    footer: {
+      margin: theme.spacing(1),
+      color: 'lightgray',
+    },
+  })
+);
 
 export default function Room() {
-  const dispatch = useDispatch();
   const room = useSelector((state) => state.room);
-
-  useEffect(() => {
-    const [, , roomId] = location.pathname.split('/');
-    if (roomId) {
-      dispatch(joinRoom({ roomId }));
-    }
-    api.onRoomUpdate(({ room }) => {
-      dispatch(update(room));
-    });
-    api.onDisconnect((reason) => {
-      console.error(`disconnected due to ${reason}`);
-    });
-  }, []);
+  const classes = useStyles();
 
   return (
-    <Container disableGutters={true}>
+    <Container className={classes.root} disableGutters={true}>
       <Header>
-        <RoomCommands />
+        <MuteButton />
+        <ShareButton />
+        <PopoutButton />
       </Header>
-      <TileContainer>
-        {room &&
-          room.emotions.map((emotion) => (
-            <EmotionTile emotion={emotion} mine={api.clientId === emotion.createdBy} key={emotion.emotionId} />
-          ))}
-        <EmotionAdder />
-      </TileContainer>
+      <Box className={classes.body}>
+        {room && room.error && <Alert severity='error'>{room.error}</Alert>}
+        <TileContainer>
+          {room &&
+            room.emotions &&
+            room.emotions.map((emotion) => <EmotionTile {...emotion} key={emotion.emotionId} />)}
+          <EmotionAdder />
+        </TileContainer>
+      </Box>
+      <Box className={classes.footer}>
+        {room && room.numberOfActiveConnections && (
+          <Typography variant='body2'>{room.numberOfActiveConnections} active connections</Typography>
+        )}
+      </Box>
     </Container>
   );
 }
