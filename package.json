@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:client": "webpack-dev-server --config client/webpack.config.js --open",
-    "build:client": "webpack --config client/webpack.config.js",
+    "build:client": "webpack -p --config client/webpack.config.js",
     "dev:server": "ts-node-dev --project server/tsconfig.json server/src/index.ts",
     "build:server": "tsc -b server/tsconfig.json",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
