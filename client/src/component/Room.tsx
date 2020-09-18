@@ -1,5 +1,8 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { useSelector } from '../store';
+import { useDispatch } from 'react-redux';
+import { joinRoom } from '../store/room';
 import { Box, Container, Typography } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
@@ -31,6 +34,14 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Room() {
   const room = useSelector((state) => state.room);
   const classes = useStyles();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const [, , roomId] = location.pathname.split('/');
+    if (roomId) {
+      dispatch(joinRoom({ roomId }));
+    }
+  }, []);
 
   return (
     <Container className={classes.root} disableGutters={true}>

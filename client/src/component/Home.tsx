@@ -12,7 +12,7 @@ export default function Home() {
 
   useEffect(() => {
     if (room && room.roomId) {
-      location.href = `/room/${room.roomId}`;
+      location.href = `/rooms/${room.roomId}`;
     }
   }, [room]);
 

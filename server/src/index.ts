@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../client/index.html'));
 });
 
-app.get('/room/:roomId', (req, res) => {
+app.get('/rooms/:roomId', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../client/room.html'));
 });
 
