@@ -15,7 +15,13 @@ export default function EmotionDialog({ title, open, onOK, onCancel, ...props })
   }
 
   function handleOK() {
-    onOK({ soundUrl, label });
+    onOK({ soundUrl, label: label || 'Custom' });
+  }
+
+  function handlePlay() {
+    const audio = new Audio(soundUrl);
+    audio.volume = 0.05;
+    audio.play();
   }
 
   return (
@@ -24,13 +30,20 @@ export default function EmotionDialog({ title, open, onOK, onCancel, ...props })
       <DialogContent>
         <TextField
           margin='dense'
-          label='URL'
+          label='Audio URL'
           type='url'
           value={soundUrl}
           fullWidth
           required
           autoFocus
           onChange={handleSoundUrlChange}
+          InputProps={{
+            endAdornment: (
+              <Button onClick={handlePlay} color='primary' disabled={!soundUrl}>
+                Play
+              </Button>
+            ),
+          }}
         />
         <TextField margin='dense' label='Label' type='text' value={label} fullWidth onChange={handleLabelChange} />
       </DialogContent>
@@ -38,7 +51,7 @@ export default function EmotionDialog({ title, open, onOK, onCancel, ...props })
         <Button onClick={onCancel} color='primary'>
           Cancel
         </Button>
-        <Button onClick={handleOK} variant='contained' color='primary' disableElevation>
+        <Button onClick={handleOK} variant='contained' color='primary' disabled={!soundUrl} disableElevation>
           OK
         </Button>
       </DialogActions>

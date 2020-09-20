@@ -12,7 +12,7 @@ import ShareButton from './button/ShareButton';
 import PopoutButton from './button/PopoutButton';
 import TileContainer from './TileContainer';
 import EmotionTile from './EmotionTile';
-import EmotionAdder from './EmotionAdder';
+import EmotionAddTile from './EmotionAddTile';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,12 +56,14 @@ export default function Room() {
           {room &&
             room.emotions &&
             room.emotions.map((emotion) => <EmotionTile {...emotion} key={emotion.emotionId} />)}
-          <EmotionAdder />
+          <EmotionAddTile />
         </TileContainer>
       </Box>
-      <Box className={classes.footer}>
-        {room && room.numberOfActiveConnections && (
-          <Typography variant='body2'>{room.numberOfActiveConnections} active connections</Typography>
+      <Box className={classes.footer} textAlign='right'>
+        {room && (
+          <Typography variant='body2'>
+            Created at {new Date(room.createdAt).toLocaleString()}, {room.numberOfActiveConnections} active connections
+          </Typography>
         )}
       </Box>
     </Container>

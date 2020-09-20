@@ -29,13 +29,14 @@ export default function createSocketServer(server) {
       room = {
         roomId,
         createdAt: Date.now(),
-        numberOfActiveConnections: 1,
+        numberOfActiveConnections: 0,
         emotions: defaultEmotions(),
       };
 
       roomMap.set(roomId, room);
       console.log(`room ${roomId} created`);
       socket.join(roomId, () => {
+        room.numberOfActiveConnections++;
         callback({ error: null, room });
       });
     });
@@ -57,9 +58,8 @@ export default function createSocketServer(server) {
 
       room = roomMap.get(roomId);
 
-      room.numberOfActiveConnections++;
-
       socket.join(roomId, () => {
+        room.numberOfActiveConnections++;
         callback({ error: null, room });
         socket.to(roomId).emit('room-update', { room });
       });
@@ -112,11 +112,11 @@ export default function createSocketServer(server) {
         if (!emotion) {
           return callback({ error: 'NoEmotionFound' });
         }
-
+        /*
         if (emotion.createdBy !== socket.id) {
           return callback({ error: 'NotAllowed' });
         }
-
+        */
         room.emotions = room.emotions.filter((emotion) => emotion.emotionId !== emotionId);
 
         callback({ error: null, room });
@@ -151,13 +151,14 @@ export default function createSocketServer(server) {
       }
       emotion.feverEndAt = now + 10 * 1000;
 
-      callback({ error: null, room });
-      socket.to(room.roomId).emit('room-update', { room });
+      callback({ error: null, emotion });
+      socket.to(room.roomId).emit('emotion-update', { emotion });
     });
 
     socket.on('disconnect', (reason: string) => {
       if (room) {
         room.numberOfActiveConnections--;
+        socket.to(room.roomId).emit('room-update', { room });
         room = null;
       }
     });

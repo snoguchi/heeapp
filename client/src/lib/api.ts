@@ -1,5 +1,13 @@
 import * as io from 'socket.io-client';
-import { CreateRoom, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion, RoomUpdate } from 'shared/api-interfaces';
+import {
+  CreateRoom,
+  JoinRoom,
+  AddEmotion,
+  RemoveEmotion,
+  SendEmotion,
+  RoomUpdate,
+  EmotionUpdate,
+} from 'shared/api-interfaces';
 
 class SocketClient {
   private socket;
@@ -37,6 +45,9 @@ class SocketClient {
   }
   onRoomUpdate(listener: (room: RoomUpdate.NotifyParam) => void) {
     this.socket.on('room-update', listener);
+  }
+  onEmotionUpdate(listener: (room: EmotionUpdate.NotifyParam) => void) {
+    this.socket.on('emotion-update', listener);
   }
   onDisconnect(listener: (reason: string) => void) {
     this.socket.on('disconnect', listener);

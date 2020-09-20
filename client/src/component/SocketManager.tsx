@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateRoom, raiseRoomError } from '../store/room';
+import { updateRoom, updateEmotion, raiseRoomError } from '../store/room';
 import api from '../lib/api';
 
 export default function SocketManager() {
@@ -9,6 +9,9 @@ export default function SocketManager() {
   useEffect(() => {
     api.onRoomUpdate(({ room }) => {
       dispatch(updateRoom(room));
+    });
+    api.onEmotionUpdate(({ emotion }) => {
+      dispatch(updateEmotion(emotion));
     });
     api.onDisconnect((reason) => {
       console.error(`disconnected due to ${reason}`);

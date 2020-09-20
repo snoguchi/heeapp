@@ -12,18 +12,19 @@ export interface Emotion {
 export interface Room {
   roomId: string;
   createdAt: number;
-  numberOfActiveConnections: number;
   emotions: Emotion[];
+  numberOfActiveConnections: number;
 }
 
 interface ResponseParamBase {
   error: 'InvalidParameter' | 'NotAllowed' | 'NoRoomFound' | 'NoEmotionFound' | 'UnexpectedError' | null;
-  room?: Room;
 }
 
 export namespace CreateRoom {
   //export const evnetName: string = 'create-room';
-  export type ResponseParam = ResponseParamBase;
+  export interface ResponseParam extends ResponseParamBase {
+    room?: Room;
+  }
 }
 
 export namespace JoinRoom {
@@ -33,7 +34,9 @@ export namespace JoinRoom {
     roomId: string;
   }
 
-  export type ResponseParam = ResponseParamBase;
+  export interface ResponseParam extends ResponseParamBase {
+    room?: Room;
+  }
 }
 
 export namespace AddEmotion {
@@ -45,7 +48,9 @@ export namespace AddEmotion {
     feverSoundUrl: string | null;
   }
 
-  export type ResponseParam = ResponseParamBase;
+  export interface ResponseParam extends ResponseParamBase {
+    room?: Room;
+  }
 }
 
 export namespace RemoveEmotion {
@@ -55,7 +60,9 @@ export namespace RemoveEmotion {
     emotionId: string;
   }
 
-  export type ResponseParam = ResponseParamBase;
+  export interface ResponseParam extends ResponseParamBase {
+    room?: Room;
+  }
 }
 
 export namespace SendEmotion {
@@ -65,7 +72,9 @@ export namespace SendEmotion {
     emotionId: string;
   }
 
-  export type ResponseParam = ResponseParamBase;
+  export interface ResponseParam extends ResponseParamBase {
+    emotion?: Emotion;
+  }
 }
 
 export namespace RoomUpdate {
@@ -73,5 +82,13 @@ export namespace RoomUpdate {
 
   export interface NotifyParam {
     room: Room;
+  }
+}
+
+export namespace EmotionUpdate {
+  //export const evnetName: string = 'emotion-update';
+
+  export interface NotifyParam {
+    emotion: Emotion;
   }
 }

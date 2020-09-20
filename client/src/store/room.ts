@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Room, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion } from 'shared/api-interfaces';
+import { Room, Emotion, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion } from 'shared/api-interfaces';
 import api from '../lib/api';
 
 const createRoom = createAsyncThunk<Room>(
@@ -34,11 +34,11 @@ const removeEmotion = createAsyncThunk<Room, RemoveEmotion.RequestParam>(
   }
 );
 
-const sendEmotion = createAsyncThunk<Room, SendEmotion.RequestParam>(
+const sendEmotion = createAsyncThunk<Emotion, SendEmotion.RequestParam>(
   'sendEmotion',
-  async (req: SendEmotion.RequestParam): Promise<Room> => {
+  async (req: SendEmotion.RequestParam): Promise<Emotion> => {
     const res = await api.sendEmotion(req);
-    return res.room;
+    return res.emotion;
   }
 );
 
@@ -48,6 +48,13 @@ interface RoomState extends Room {
   error: string | null;
 }
 
+const cloneRoomStateWithNewEmotion = (roomState: RoomState, newEmotion: Emotion): Room => {
+  const emotions = roomState.emotions.map((emotion) =>
+    emotion.emotionId === newEmotion.emotionId ? newEmotion : { ...emotion }
+  );
+  return { ...roomState, emotions };
+};
+
 const slice = createSlice({
   name: 'room',
   initialState: null,
@@ -55,14 +62,29 @@ const slice = createSlice({
     updateRoom: (state: RoomState, action: PayloadAction<Room>) => {
       return { ...state, ...action.payload };
     },
+    updateEmotion: (state: RoomState, action: PayloadAction<Emotion>) => {
+      return cloneRoomStateWithNewEmotion(state, action.payload);
+    },
     raiseRoomError: (state: RoomState, action: PayloadAction<string | null>) => {
       return { ...state, error: action.payload };
     },
   },
   extraReducers: (builder) => {
-    [createRoom, joinRoom, addEmotion, removeEmotion, sendEmotion].forEach((thunk) => {
+    [createRoom, joinRoom, addEmotion, removeEmotion].forEach((thunk) => {
       builder.addCase(thunk.fulfilled, (state: RoomState, action: PayloadAction<Room>) => {
         return { error: null, ...action.payload };
+      });
+      builder.addCase(thunk.rejected, (state: RoomState, action) => {
+        return { ...state, error: action.error.message };
+      });
+    });
+
+    [sendEmotion].forEach((thunk) => {
+      builder.addCase(thunk.fulfilled, (state: RoomState, action: PayloadAction<Emotion>) => {
+        return {
+          ...cloneRoomStateWithNewEmotion(state, action.payload),
+          error: null,
+        };
       });
       builder.addCase(thunk.rejected, (state: RoomState, action) => {
         return { ...state, error: action.error.message };
@@ -71,6 +93,6 @@ const slice = createSlice({
   },
 });
 
-export const { updateRoom, raiseRoomError } = slice.actions;
+export const { updateRoom, updateEmotion, raiseRoomError } = slice.actions;
 
 export default slice.reducer;

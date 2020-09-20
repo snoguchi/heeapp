@@ -19,7 +19,7 @@ export default function Header(props) {
   return (
     <Toolbar className={classes.root}>
       <Typography variant='h5' className={classes.title}>
-        <Link href='/' color='inherit'>
+        <Link href='/' color='inherit' underline='none'>
           HeeApp
         </Link>
       </Typography>
