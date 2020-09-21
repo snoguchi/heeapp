@@ -35,7 +35,7 @@ export default function createSocketServer(server) {
       roomMap.set(roomId, room);
       console.log(`room ${roomId} created`);
       socket.join(roomId, () => {
-        room.numberOfActiveConnections++;
+        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId].length;
         callback({ error: null, room });
         saveRoom(room);
       });
@@ -66,7 +66,7 @@ export default function createSocketServer(server) {
       }
 
       socket.join(roomId, () => {
-        room.numberOfActiveConnections++;
+        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId].length;
         callback({ error: null, room });
         socket.to(roomId).emit('room-update', { room });
       });
@@ -97,6 +97,8 @@ export default function createSocketServer(server) {
         feverSoundUrl,
       });
 
+      room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId].length;
+
       callback({ error: null, room });
       socket.to(room.roomId).emit('room-update', { room });
       saveRoom(room);
@@ -126,6 +128,7 @@ export default function createSocketServer(server) {
         }
         */
         room.emotions = room.emotions.filter((emotion) => emotion.emotionId !== emotionId);
+        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId].length;
 
         callback({ error: null, room });
         socket.to(room.roomId).emit('room-update', { room });
@@ -160,6 +163,8 @@ export default function createSocketServer(server) {
       }
       emotion.feverEndAt = now + 10 * 1000;
 
+      room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId].length;
+
       callback({ error: null, emotion });
       socket.to(room.roomId).emit('emotion-update', { emotion });
       saveRoom(room);
@@ -167,7 +172,7 @@ export default function createSocketServer(server) {
 
     socket.on('disconnect', (reason: string) => {
       if (room) {
-        room.numberOfActiveConnections--;
+        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId].length;
         socket.to(room.roomId).emit('room-update', { room });
         room = null;
       }
