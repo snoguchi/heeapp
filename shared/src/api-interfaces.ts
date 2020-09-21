@@ -2,9 +2,9 @@ export interface Emotion {
   emotionId: string;
   createdBy: string | null;
   label: string;
+  count: number;
   soundUrl: string;
-  total: number;
-  fever: number;
+  feverCount: number;
   feverEndAt: number;
   feverSoundUrl: string | null;
 }

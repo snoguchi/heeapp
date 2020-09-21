@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { useSelector } from '../store';
 import { useDispatch } from 'react-redux';
 import { sendEmotion, removeEmotion } from '../store/room';
 import { IconButton, Card, CardActionArea, CardContent, LinearProgress, Typography } from '@material-ui/core';
@@ -25,15 +24,14 @@ const useStyles = makeStyles(() =>
 
 export default function EmotionTile(emotion: Emotion) {
   const dispatch = useDispatch();
-  const config = useSelector((state) => state.config);
   const classes = useStyles();
 
-  const [fever, setFever] = useState(0);
+  const [feverCount, setFeverCount] = useState(0);
   useEffect(() => {
-    const timerId = setTimeout(() => setFever(0), emotion.feverEndAt - Date.now());
-    setFever(emotion.fever);
+    const timerId = setTimeout(() => setFeverCount(0), emotion.feverEndAt - Date.now());
+    setFeverCount(emotion.feverCount);
     return () => clearTimeout(timerId);
-  }, [emotion.fever]);
+  }, [emotion.feverCount]);
 
   function handleSendEmotion() {
     dispatch(sendEmotion({ emotionId: emotion.emotionId }));
@@ -54,7 +52,7 @@ export default function EmotionTile(emotion: Emotion) {
       <CardActionArea onClick={handleSendEmotion}>
         <CardContent>
           <Typography variant='h1' align='center' noWrap>
-            {emotion.total}
+            {emotion.count}
           </Typography>
           <Typography variant='h5' align='center' noWrap>
             {emotion.label}
@@ -64,8 +62,8 @@ export default function EmotionTile(emotion: Emotion) {
       {emotion.feverSoundUrl && (
         <LinearProgress
           variant='determinate'
-          color={fever < 10 ? 'primary' : 'secondary'}
-          value={Math.min(fever * 10, 100)}
+          color={feverCount < 10 ? 'primary' : 'secondary'}
+          value={Math.min(feverCount * 10, 100)}
         />
       )}
     </Card>

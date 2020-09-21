@@ -9,7 +9,7 @@ export default function EmotionPlayer(emotion: Emotion) {
   useEffect(() => {
     if (mounted.current) {
       if (!config.mute) {
-        const src = emotion.feverSoundUrl && emotion.fever >= 10 ? emotion.feverSoundUrl : emotion.soundUrl;
+        const src = emotion.feverSoundUrl && emotion.feverCount >= 10 ? emotion.feverSoundUrl : emotion.soundUrl;
         const audio = new Audio(src);
         audio.volume = 0.05;
         audio.play();
@@ -17,7 +17,7 @@ export default function EmotionPlayer(emotion: Emotion) {
     } else {
       mounted.current = true;
     }
-  }, [emotion.total]);
+  }, [emotion.count]);
 
   return null;
 }

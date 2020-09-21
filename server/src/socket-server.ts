@@ -91,8 +91,8 @@ export default function createSocketServer(server) {
         createdBy,
         label,
         soundUrl,
-        total: 0,
-        fever: 0,
+        count: 0,
+        feverCount: 0,
         feverEndAt: 0,
         feverSoundUrl,
       });
@@ -150,13 +150,13 @@ export default function createSocketServer(server) {
         return callback({ error: 'NoEmotionFound' });
       }
 
-      emotion.total++;
+      emotion.count++;
 
       const now = Date.now();
       if (now >= emotion.feverEndAt) {
-        emotion.fever = 1;
+        emotion.feverCount = 1;
       } else {
-        emotion.fever++;
+        emotion.feverCount++;
       }
       emotion.feverEndAt = now + 10 * 1000;
 
