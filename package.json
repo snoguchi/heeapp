@@ -26,6 +26,7 @@
     "@reduxjs/toolkit": "^1.4.0",
     "copy-to-clipboard": "^3.3.1",
     "express": "^4.17.1",
+    "mongodb": "^3.6.2",
     "nanoid": "^3.1.12",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -33,6 +34,7 @@
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
+    "@types/mongodb": "^3.5.27",
     "@types/nanoid": "^2.1.0",
     "@types/react": "^16.9.49",
     "@types/react-dom": "^16.9.8",

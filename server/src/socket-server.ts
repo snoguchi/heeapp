@@ -1,9 +1,8 @@
-'use strict';
-
 const { nanoid } = require('nanoid');
 const socketio = require('socket.io');
 import { Room, CreateRoom, JoinRoom, AddEmotion, SendEmotion, RemoveEmotion } from 'shared/api-interfaces';
 import defaultEmotions from './default-emotions';
+import { saveRoom, restoreRoom } from './storage';
 
 type Callback<T> = (response: T) => void;
 
@@ -38,25 +37,33 @@ export default function createSocketServer(server) {
       socket.join(roomId, () => {
         room.numberOfActiveConnections++;
         callback({ error: null, room });
+        saveRoom(room);
       });
     });
 
-    socket.on('join-room', (param: JoinRoom.RequestParam, callback: Callback<JoinRoom.ResponseParam>) => {
+    socket.on('join-room', async (param: JoinRoom.RequestParam, callback: Callback<JoinRoom.ResponseParam>) => {
       const { roomId } = param;
 
       if (!roomId) {
         return callback({ error: 'InvalidParameter' });
       }
 
-      if (!roomMap.has(roomId)) {
-        return callback({ error: 'NoRoomFound' });
-      }
-
       if (room !== null) {
         return callback({ error: 'NotAllowed' });
       }
 
-      room = roomMap.get(roomId);
+      if (roomMap.has(roomId)) {
+        room = roomMap.get(roomId);
+      } else {
+        console.time('restoreRoom');
+        room = await restoreRoom(roomId);
+        console.timeEnd('restoreRoom');
+        if (room) {
+          roomMap.set(roomId, room);
+        } else {
+          return callback({ error: 'NoRoomFound' });
+        }
+      }
 
       socket.join(roomId, () => {
         room.numberOfActiveConnections++;
@@ -92,6 +99,7 @@ export default function createSocketServer(server) {
 
       callback({ error: null, room });
       socket.to(room.roomId).emit('room-update', { room });
+      saveRoom(room);
     });
 
     socket.on(
@@ -121,6 +129,7 @@ export default function createSocketServer(server) {
 
         callback({ error: null, room });
         socket.to(room.roomId).emit('room-update', { room });
+        saveRoom(room);
       }
     );
 
@@ -153,6 +162,7 @@ export default function createSocketServer(server) {
 
       callback({ error: null, emotion });
       socket.to(room.roomId).emit('emotion-update', { emotion });
+      saveRoom(room);
     });
 
     socket.on('disconnect', (reason: string) => {
