@@ -10,6 +10,9 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       flexGrow: 1,
     },
+    beta: {
+      fontSize: '30%',
+    },
   })
 );
 
@@ -22,6 +25,7 @@ export default function Header(props) {
         <Link href='/' color='inherit' underline='none'>
           HeeApp
         </Link>
+        <sup className={classes.beta}>BETA</sup>
       </Typography>
       {props.children}
     </Toolbar>
