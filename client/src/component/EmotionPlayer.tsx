@@ -1,23 +1,46 @@
 import { useEffect, useRef } from 'react';
 import { useSelector } from '../store';
 import { Emotion } from 'shared/api-interfaces';
+import { Howl, Howler } from 'howler';
 
 export default function EmotionPlayer(emotion: Emotion) {
-  const config = useSelector((state) => state.config);
+  const mute = useSelector((state) => state.config.mute);
+
+  const sound = useRef(null);
+  useEffect(() => {
+    if (emotion.soundUrl) {
+      sound.current = new Howl({
+        src: emotion.soundUrl,
+        volume: 0.05,
+        html5: emotion.soundUrl.charAt(0) !== '/',
+      });
+    }
+  }, [emotion.soundUrl]);
+
+  const feverSound = useRef(null);
+  useEffect(() => {
+    if (emotion.feverSoundUrl) {
+      feverSound.current = new Howl({
+        src: emotion.feverSoundUrl,
+        volume: 0.05,
+        html5: emotion.soundUrl.charAt(0) !== '/',
+      });
+    }
+  }, [emotion.feverSoundUrl]);
 
   const mounted = useRef(false);
   useEffect(() => {
     if (mounted.current) {
-      if (!config.mute) {
-        const src = emotion.feverSoundUrl && emotion.feverCount >= 10 ? emotion.feverSoundUrl : emotion.soundUrl;
-        const audio = new Audio(src);
-        audio.volume = 0.05;
-        audio.play();
-      }
+      const s = emotion.feverSoundUrl && emotion.feverCount >= 10 ? feverSound : sound;
+      s.current.play();
     } else {
       mounted.current = true;
     }
   }, [emotion.count]);
+
+  useEffect(() => {
+    Howler.mute(mute);
+  }, [mute]);
 
   return null;
 }
