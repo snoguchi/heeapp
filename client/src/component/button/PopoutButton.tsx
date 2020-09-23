@@ -4,7 +4,7 @@ import { Launch } from '@material-ui/icons';
 
 export default function PopoutButton() {
   function handleClick() {
-    window.open(location.pathname, 'popout', 'resizable,scrollbars,width=300,height=500');
+    window.open(location.pathname, 'popout', 'resizable,scrollbars,width=300,height=650');
   }
 
   if (window.name === 'popout') {
