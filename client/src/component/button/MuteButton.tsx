@@ -8,15 +8,16 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(() =>
   createStyles({
-    tooltipPlacementBottom: {
+    tooltip: {
       margin: 0,
+      fontSize: '1em',
     },
   })
 );
 
 export default function MuteButton() {
   const dispatch = useDispatch();
-  const config = useSelector((state) => state.config);
+  const isMute = useSelector((state) => state.config.isMute);
   const classes = useStyles();
 
   function handleUnmute() {
@@ -27,7 +28,7 @@ export default function MuteButton() {
     dispatch(mute());
   }
 
-  if (config.mute) {
+  if (isMute) {
     return (
       <Tooltip title='音声がミュートされています' classes={classes} arrow open={true}>
         <IconButton color='inherit' aria-label='Unmute' onClick={handleUnmute}>

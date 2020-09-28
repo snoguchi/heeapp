@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Box } from '@material-ui/core';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       display: 'flex',
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function Room({ children }) {
+export default function FlexContainer({ children }) {
   const classes = useStyles();
 
   return <Box className={classes.root}>{children}</Box>;

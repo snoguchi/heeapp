@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  mute: true,
+  isMute: true,
 };
 
 const slice = createSlice({
@@ -9,10 +9,10 @@ const slice = createSlice({
   initialState,
   reducers: {
     mute: (state) => {
-      return { ...state, mute: true };
+      return { ...state, isMute: true };
     },
     unmute: (state) => {
-      return { ...state, mute: false };
+      return { ...state, isMute: false };
     },
   },
 });

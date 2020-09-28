@@ -3,8 +3,8 @@ import { useSelector } from '../store';
 import { Emotion } from 'shared/api-interfaces';
 import { Howl, Howler } from 'howler';
 
-export default function EmotionPlayer(emotion: Emotion) {
-  const mute = useSelector((state) => state.config.mute);
+export default function EmotionSoundPlayer(emotion: Emotion) {
+  const isMute = useSelector((state) => state.config.isMute);
 
   const sound = useRef(null);
   useEffect(() => {
@@ -39,8 +39,8 @@ export default function EmotionPlayer(emotion: Emotion) {
   }, [emotion.count]);
 
   useEffect(() => {
-    Howler.mute(mute);
-  }, [mute]);
+    Howler.mute(isMute);
+  }, [isMute]);
 
   return null;
 }
