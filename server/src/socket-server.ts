@@ -1,183 +1,212 @@
 const { nanoid } = require('nanoid');
 const socketio = require('socket.io');
 import { Room, CreateRoom, JoinRoom, AddEmotion, SendEmotion, RemoveEmotion } from 'shared/api-interfaces';
-import defaultEmotions from './default-emotions';
-import { saveRoom, restoreRoom } from './storage';
+import { createRoom as mongoCreateRoom, restoreRoom, updateRoom } from './room-manager';
 
 type Callback<T> = (response: T) => void;
 
-const roomMap = new Map<string, Room>();
+interface Session {
+  room: Room | null;
+}
 
-export default function createSocketServer(server) {
-  const io = socketio(server);
+const createRoom = async (
+  params: CreateRoom.RequestParam,
+  callback: Callback<CreateRoom.ResponseParam>,
+  session: Session,
+  socket,
+  server
+) => {
+  if (session.room !== null) {
+    return callback({ error: 'NotAllowed' });
+  }
 
-  io.on('connection', (socket) => {
-    let room: Room = null;
+  const room = await mongoCreateRoom();
+  const { roomId } = room;
 
-    socket.on('create-room', (callback: Callback<CreateRoom.ResponseParam>) => {
-      if (room !== null) {
-        return callback({ error: 'NotAllowed' });
-      }
+  console.log(`room ${roomId} created`);
 
-      const roomId = nanoid();
+  socket.join(roomId, () => {
+    room.numberOfActiveConnections = server.sockets.adapter.rooms[roomId]?.length || 0;
 
-      if (roomMap.has(roomId)) {
-        return callback({ error: 'UnexpectedError' });
-      }
+    session.room = room;
+    callback({ error: null, room });
+  });
+};
 
-      room = {
-        roomId,
-        createdAt: Date.now(),
-        numberOfActiveConnections: 0,
-        emotions: defaultEmotions(),
-      };
+const joinRoom = async (
+  params: JoinRoom.RequestParam,
+  callback: Callback<JoinRoom.ResponseParam>,
+  session: Session,
+  socket,
+  server
+) => {
+  const { roomId } = params;
 
-      roomMap.set(roomId, room);
-      console.log(`room ${roomId} created`);
-      socket.join(roomId, () => {
-        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId]?.length || 0;
-        callback({ error: null, room });
-        saveRoom(room);
-      });
-    });
+  if (!roomId) {
+    return callback({ error: 'InvalidParameter' });
+  }
 
-    socket.on('join-room', async (param: JoinRoom.RequestParam, callback: Callback<JoinRoom.ResponseParam>) => {
-      const { roomId } = param;
+  if (session.room !== null) {
+    return callback({ error: 'NotAllowed' });
+  }
 
-      if (!roomId) {
-        return callback({ error: 'InvalidParameter' });
-      }
+  const room = await restoreRoom(roomId);
+  if (!room) {
+    return callback({ error: 'NoRoomFound' });
+  }
 
-      if (room !== null) {
-        return callback({ error: 'NotAllowed' });
-      }
+  socket.join(roomId, () => {
+    room.numberOfActiveConnections = server.sockets.adapter.rooms[room.roomId]?.length || 0;
+    session.room = room;
+    callback({ error: null, room });
+    socket.to(roomId).emit('room-update', { room });
+  });
+};
 
-      if (roomMap.has(roomId)) {
-        room = roomMap.get(roomId);
-      } else {
-        console.time('restoreRoom');
-        room = await restoreRoom(roomId);
-        console.timeEnd('restoreRoom');
-        if (room) {
-          roomMap.set(roomId, room);
-        } else {
-          return callback({ error: 'NoRoomFound' });
-        }
-      }
+const addEmotion = (
+  params: AddEmotion.RequestParam,
+  callback: Callback<AddEmotion.ResponseParam>,
+  session: Session,
+  socket,
+  server
+) => {
+  const { label, soundUrl, feverSoundUrl } = params;
+  const { room } = session;
 
-      socket.join(roomId, () => {
-        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId]?.length || 0;
-        callback({ error: null, room });
-        socket.to(roomId).emit('room-update', { room });
-      });
-    });
+  if (!label || !soundUrl) {
+    return callback({ error: 'InvalidParameter' });
+  }
 
-    socket.on('add-emotion', (param: AddEmotion.RequestParam, callback: Callback<AddEmotion.ResponseParam>) => {
-      const { label, soundUrl, feverSoundUrl } = param;
+  if (session.room === null) {
+    return callback({ error: 'NotAllowed' });
+  }
 
-      if (!label || !soundUrl) {
-        return callback({ error: 'InvalidParameter' });
-      }
+  const emotionId = 'emo:' + nanoid();
+  const createdBy = socket.id;
 
-      if (room === null) {
-        return callback({ error: 'NotAllowed' });
-      }
+  room.emotions.push({
+    emotionId,
+    createdBy,
+    label,
+    soundUrl,
+    count: 0,
+    feverCount: 0,
+    feverEndAt: 0,
+    feverSoundUrl,
+  });
 
-      const emotionId = 'emo:' + nanoid();
-      const createdBy = socket.id;
+  room.numberOfActiveConnections = server.sockets.adapter.rooms[room.roomId]?.length || 0;
 
-      room.emotions.push({
-        emotionId,
-        createdBy,
-        label,
-        soundUrl,
-        count: 0,
-        feverCount: 0,
-        feverEndAt: 0,
-        feverSoundUrl,
-      });
+  callback({ error: null, room });
+  socket.to(room.roomId).emit('room-update', { room });
+  updateRoom(room);
+};
 
-      room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId]?.length || 0;
+const removeEmotion = (
+  params: RemoveEmotion.RequestParam,
+  callback: Callback<RemoveEmotion.ResponseParam>,
+  session: Session,
+  socket,
+  server
+) => {
+  const { emotionId } = params;
+  const { room } = session;
 
-      callback({ error: null, room });
-      socket.to(room.roomId).emit('room-update', { room });
-      saveRoom(room);
-    });
+  if (!emotionId) {
+    return callback({ error: 'InvalidParameter' });
+  }
 
-    socket.on(
-      'remove-emotion',
-      (param: RemoveEmotion.RequestParam, callback: Callback<RemoveEmotion.ResponseParam>) => {
-        const { emotionId } = param;
+  if (room === null) {
+    return callback({ error: 'NotAllowed' });
+  }
 
-        if (!emotionId) {
-          return callback({ error: 'InvalidParameter' });
-        }
+  const emotion = room.emotions.find((emotion) => emotion.emotionId === emotionId);
 
-        if (room === null) {
-          return callback({ error: 'NotAllowed' });
-        }
+  if (!emotion) {
+    return callback({ error: 'NoEmotionFound' });
+  }
+  /*
+  if (emotion.createdBy !== socket.id) {
+    return callback({ error: 'NotAllowed' });
+  }
+  */
+  room.emotions = room.emotions.filter((emotion) => emotion.emotionId !== emotionId);
+  room.numberOfActiveConnections = server.sockets.adapter.rooms[room.roomId]?.length || 0;
 
-        const emotion = room.emotions.find((emotion) => emotion.emotionId === emotionId);
+  callback({ error: null, room });
+  socket.to(room.roomId).emit('room-update', { room });
 
-        if (!emotion) {
-          return callback({ error: 'NoEmotionFound' });
-        }
-        /*
-        if (emotion.createdBy !== socket.id) {
-          return callback({ error: 'NotAllowed' });
-        }
-        */
-        room.emotions = room.emotions.filter((emotion) => emotion.emotionId !== emotionId);
-        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId]?.length || 0;
+  updateRoom(room);
+};
 
-        callback({ error: null, room });
-        socket.to(room.roomId).emit('room-update', { room });
-        saveRoom(room);
-      }
-    );
+const sendEmotion = (
+  params: SendEmotion.RequestParam,
+  callback: Callback<SendEmotion.ResponseParam>,
+  session: Session,
+  socket,
+  server
+) => {
+  const { emotionId } = params;
+  const { room } = session;
 
-    socket.on('send-emotion', (param: SendEmotion.RequestParam, callback: Callback<SendEmotion.ResponseParam>) => {
-      const { emotionId } = param;
+  if (!emotionId) {
+    return callback({ error: 'InvalidParameter' });
+  }
 
-      if (!emotionId) {
-        return callback({ error: 'InvalidParameter' });
-      }
+  if (room === null) {
+    return callback({ error: 'NotAllowed' });
+  }
 
-      if (room === null) {
-        return callback({ error: 'NotAllowed' });
-      }
+  const emotion = room.emotions.find((emotion) => emotion.emotionId === emotionId);
 
-      const emotion = room.emotions.find((emotion) => emotion.emotionId === emotionId);
+  if (!emotion) {
+    return callback({ error: 'NoEmotionFound' });
+  }
 
-      if (!emotion) {
-        return callback({ error: 'NoEmotionFound' });
-      }
+  emotion.count++;
 
-      emotion.count++;
+  const now = Date.now();
+  if (now >= emotion.feverEndAt) {
+    emotion.feverCount = 1;
+  } else {
+    emotion.feverCount++;
+  }
+  emotion.feverEndAt = now + 10 * 1000;
 
-      const now = Date.now();
-      if (now >= emotion.feverEndAt) {
-        emotion.feverCount = 1;
-      } else {
-        emotion.feverCount++;
-      }
-      emotion.feverEndAt = now + 10 * 1000;
+  room.numberOfActiveConnections = server.sockets.adapter.rooms[room.roomId]?.length || 0;
 
-      room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId]?.length || 0;
+  callback({ error: null, emotion });
+  socket.to(room.roomId).emit('emotion-update', { emotion });
 
-      callback({ error: null, emotion });
-      socket.to(room.roomId).emit('emotion-update', { emotion });
-      saveRoom(room);
-    });
+  updateRoom(room, 10000);
+};
+
+const leaveRoom = (session: Session, socket, server) => {
+  const { room } = session;
+  if (room) {
+    room.numberOfActiveConnections = server.sockets.adapter.rooms[room.roomId]?.length || 0;
+    socket.to(room.roomId).emit('room-update', { room });
+    session.room = null;
+  }
+};
+
+export default function createSocketServer(httpServer) {
+  const server = socketio(httpServer);
+
+  server.on('connection', (socket) => {
+    let session = { room: null };
+
+    socket.on('create-room', (params, callback) => createRoom(params, callback, session, socket, server));
+    socket.on('join-room', (params, callback) => joinRoom(params, callback, session, socket, server));
+    socket.on('add-emotion', (params, callback) => addEmotion(params, callback, session, socket, server));
+    socket.on('remove-emotion', (params, callback) => removeEmotion(params, callback, session, socket, server));
+    socket.on('send-emotion', (params, callback) => sendEmotion(params, callback, session, socket, server));
 
     socket.on('disconnect', (reason: string) => {
-      if (room) {
-        room.numberOfActiveConnections = io.sockets.adapter.rooms[room.roomId]?.length || 0;
-        socket.to(room.roomId).emit('room-update', { room });
-        room = null;
-      }
+      leaveRoom(session, socket, server);
+      session = null;
     });
   });
 
-  return io;
+  return server;
 }

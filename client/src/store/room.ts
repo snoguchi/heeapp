@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Room, Emotion, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion } from 'shared/api-interfaces';
+import { Room, Emotion, CreateRoom, JoinRoom, AddEmotion, RemoveEmotion, SendEmotion } from 'shared/api-interfaces';
 import api from '../lib/api';
 
-const createRoom = createAsyncThunk<Room>(
+const createRoom = createAsyncThunk<Room, CreateRoom.RequestParam>(
   'createRoom',
-  async (): Promise<Room> => {
-    const res = await api.createRoom();
+  async (req: CreateRoom.RequestParam): Promise<Room> => {
+    const res = await api.createRoom(req);
     return res.room;
   }
 );

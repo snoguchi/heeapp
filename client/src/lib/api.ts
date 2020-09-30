@@ -28,8 +28,8 @@ class SocketClient {
       });
     });
   }
-  async createRoom(): Promise<CreateRoom.ResponseParam> {
-    return this.emit<CreateRoom.ResponseParam>('create-room');
+  async createRoom(req: CreateRoom.RequestParam): Promise<CreateRoom.ResponseParam> {
+    return this.emit<CreateRoom.ResponseParam>('create-room', req);
   }
   async joinRoom(req: JoinRoom.RequestParam): Promise<JoinRoom.ResponseParam> {
     return this.emit<JoinRoom.ResponseParam>('join-room', req);

@@ -33,7 +33,7 @@ export default function Home() {
         <Typography variant='h5' className={classes.para}>
           あなたのテレビ会議に「へぇ」ボタンを
         </Typography>
-        <Button variant='contained' color='primary' onClick={() => dispatch(createRoom())}>
+        <Button variant='contained' color='primary' onClick={() => dispatch(createRoom({}))}>
           へぇボタンをつくる
         </Button>
       </Box>

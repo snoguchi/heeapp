@@ -17,11 +17,14 @@ export interface Room {
 }
 
 interface ResponseParamBase {
-  error: 'InvalidParameter' | 'NotAllowed' | 'NoRoomFound' | 'NoEmotionFound' | 'UnexpectedError' | null;
+  error: 'InvalidParameter' | 'NotAllowed' | 'NoRoomFound' | 'NoEmotionFound' | null;
 }
 
 export namespace CreateRoom {
   //export const evnetName: string = 'create-room';
+
+  export interface RequestParam {}
+
   export interface ResponseParam extends ResponseParamBase {
     room?: Room;
   }
