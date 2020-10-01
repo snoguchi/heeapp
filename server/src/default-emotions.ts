@@ -4,7 +4,6 @@ export default function getDefaultEmotions(): Emotion[] {
   return [
     {
       emotionId: 'hee',
-      createdBy: null,
       label: 'へぇ',
       soundUrl: '/sound/hee.mp3',
       count: 0,
@@ -14,7 +13,6 @@ export default function getDefaultEmotions(): Emotion[] {
     },
     {
       emotionId: 'laugh',
-      createdBy: null,
       label: '笑',
       soundUrl: '/sound/laugh.mp3',
       count: 0,
@@ -24,7 +22,6 @@ export default function getDefaultEmotions(): Emotion[] {
     },
     {
       emotionId: 'clap',
-      createdBy: null,
       label: '拍手',
       soundUrl: '/sound/clap.mp3',
       count: 0,
@@ -34,7 +31,6 @@ export default function getDefaultEmotions(): Emotion[] {
     },
     {
       emotionId: 'coin',
-      createdBy: null,
       label: '＄',
       soundUrl: '/sound/coin.mp3',
       count: 0,

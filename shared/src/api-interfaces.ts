@@ -1,12 +1,11 @@
 export interface Emotion {
   emotionId: string;
-  createdBy: string | null;
   label: string;
-  count: number;
   soundUrl: string;
+  count: number;
+  feverSoundUrl: string | null;
   feverCount: number;
   feverEndAt: number;
-  feverSoundUrl: string | null;
 }
 
 export interface Room {

@@ -82,11 +82,9 @@ const addEmotion = (
   }
 
   const emotionId = 'emo:' + nanoid();
-  const createdBy = socket.id;
 
   room.emotions.push({
     emotionId,
-    createdBy,
     label,
     soundUrl,
     count: 0,
@@ -125,11 +123,7 @@ const removeEmotion = (
   if (!emotion) {
     return callback({ error: 'NoEmotionFound' });
   }
-  /*
-  if (emotion.createdBy !== socket.id) {
-    return callback({ error: 'NotAllowed' });
-  }
-  */
+
   room.emotions = room.emotions.filter((emotion) => emotion.emotionId !== emotionId);
   room.numberOfActiveConnections = server.sockets.adapter.rooms[room.roomId]?.length || 0;
 

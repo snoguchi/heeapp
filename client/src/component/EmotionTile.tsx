@@ -20,7 +20,7 @@ export default function EmotionTile(emotion: Emotion) {
   return (
     <TileItem
       onClick={handleSendEmotion}
-      onClose={emotion.createdBy !== null && handleRemoveEmotion}
+      onClose={handleRemoveEmotion}
       content={emotion.count}
       label={emotion.label}
     >
