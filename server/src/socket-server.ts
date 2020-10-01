@@ -1,13 +1,16 @@
 const { nanoid } = require('nanoid');
 const socketio = require('socket.io');
 import { Room, CreateRoom, JoinRoom, AddEmotion, SendEmotion, RemoveEmotion } from 'shared/api-interfaces';
-import { createRoom as mongoCreateRoom, restoreRoom, updateRoom } from './room-manager';
+import { getDefaultDataStore } from './data-store';
+import { getDefaultEmotions } from './config';
 
 type Callback<T> = (response: T) => void;
 
 interface Session {
   room: Room | null;
 }
+
+const dataStore = getDefaultDataStore();
 
 const createRoom = async (
   params: CreateRoom.RequestParam,
@@ -20,14 +23,21 @@ const createRoom = async (
     return callback({ error: 'NotAllowed' });
   }
 
-  const room = await mongoCreateRoom();
-  const { roomId } = room;
+  const roomId = nanoid();
+
+  const room: Room = {
+    roomId,
+    createdAt: Date.now(),
+    emotions: getDefaultEmotions(),
+    numberOfActiveConnections: 0,
+  };
+
+  await dataStore.addRoom(room);
 
   console.log(`room ${roomId} created`);
 
   socket.join(roomId, () => {
     room.numberOfActiveConnections = server.sockets.adapter.rooms[roomId]?.length || 0;
-
     session.room = room;
     callback({ error: null, room });
   });
@@ -50,13 +60,13 @@ const joinRoom = async (
     return callback({ error: 'NotAllowed' });
   }
 
-  const room = await restoreRoom(roomId);
+  const room: Room = await dataStore.getRoom(roomId);
   if (!room) {
     return callback({ error: 'NoRoomFound' });
   }
 
   socket.join(roomId, () => {
-    room.numberOfActiveConnections = server.sockets.adapter.rooms[room.roomId]?.length || 0;
+    room.numberOfActiveConnections = server.sockets.adapter.rooms[roomId]?.length || 0;
     session.room = room;
     callback({ error: null, room });
     socket.to(roomId).emit('room-update', { room });
@@ -85,6 +95,7 @@ const addEmotion = (
 
   room.emotions.push({
     emotionId,
+    createdAt: Date.now(),
     label,
     soundUrl,
     count: 0,
@@ -97,7 +108,7 @@ const addEmotion = (
 
   callback({ error: null, room });
   socket.to(room.roomId).emit('room-update', { room });
-  updateRoom(room);
+  dataStore.updateRoom(room);
 };
 
 const removeEmotion = (
@@ -130,7 +141,7 @@ const removeEmotion = (
   callback({ error: null, room });
   socket.to(room.roomId).emit('room-update', { room });
 
-  updateRoom(room);
+  dataStore.updateRoom(room);
 };
 
 const sendEmotion = (
@@ -172,7 +183,7 @@ const sendEmotion = (
   callback({ error: null, emotion });
   socket.to(room.roomId).emit('emotion-update', { emotion });
 
-  updateRoom(room, 10000);
+  dataStore.lazyUpdateRoom(room, 10000);
 };
 
 const leaveRoom = (session: Session, socket, server) => {

@@ -72,8 +72,8 @@ export default function TileItem({ children, onClick, onClose = null, content, l
       className={`${classes.root} ${primary ? classes.primary : classes.secondary}`}
     >
       {onClose && (
-        <IconButton className={classes.actions} onClick={onClose}>
-          <Close />
+        <IconButton className={classes.actions} onClick={onClose} size='small'>
+          <Close fontSize='small' style={{ color: 'lightgray' }} />
         </IconButton>
       )}
       <CardActionArea onClick={onClick}>{xs ? <Phone /> : <Tablet />}</CardActionArea>

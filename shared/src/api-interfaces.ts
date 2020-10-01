@@ -1,5 +1,6 @@
 export interface Emotion {
   emotionId: string;
+  createdAt: number;
   label: string;
   soundUrl: string;
   count: number;

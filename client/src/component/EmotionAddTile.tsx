@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addEmotion } from '../store/room';
-import TileItem from './TileItem';
+import Tile from './Tile';
 import EmotionDialog from './EmotionDialog';
 
 export default function EmotionAdder() {
@@ -24,8 +24,8 @@ export default function EmotionAdder() {
   }
 
   return (
-    <TileItem onClick={openDialog} content='+' label='Add' primary={false}>
+    <Tile onClick={openDialog} content='+' label='Add' primary={false}>
       <EmotionDialog title='音声を追加する' open={dialogVisible} onOK={handleOK} onCancel={handleCancel} />
-    </TileItem>
+    </Tile>
   );
 }
