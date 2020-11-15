@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { IconButton, Snackbar } from '@material-ui/core';
 import { Box, Button, TextField, Dialog, DialogContent } from '@material-ui/core';
 import { Share } from '@material-ui/icons';
-import DialogTitleWithCloseButton from './DialogTitleWithCloseButton';
+import { DialogTitleWithCloseButton } from './DialogTitleWithCloseButton';
 import * as QRCode from 'qrcode.react';
 import * as copyToClipboard from 'copy-to-clipboard';
 
-export default function ShareButton() {
+export const ShareButton: React.FC = () => {
   const [barVisibility, setBarVisibility] = useState<boolean>(false);
   const [dialogVisibility, setDialogVisibility] = useState<boolean>(false);
 
@@ -64,4 +64,4 @@ export default function ShareButton() {
       />
     </React.Fragment>
   );
-}
+};

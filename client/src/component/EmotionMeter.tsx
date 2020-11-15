@@ -2,7 +2,12 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { LinearProgress } from '@material-ui/core';
 
-export default function EmotionMeter({ feverCount, feverEndAt }) {
+export interface EmotionMeterProps {
+  feverCount: number;
+  feverEndAt: number;
+}
+
+export const EmotionMeter: React.FC<EmotionMeterProps> = ({ feverCount, feverEndAt }) => {
   const [color, setColor] = useState<'primary' | 'secondary'>('primary');
   const [value, setValue] = useState<number>(feverCount);
 
@@ -17,4 +22,4 @@ export default function EmotionMeter({ feverCount, feverEndAt }) {
   }, [feverCount]);
 
   return <LinearProgress variant='determinate' color={color} value={value} />;
-}
+};

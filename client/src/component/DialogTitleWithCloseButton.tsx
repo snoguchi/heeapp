@@ -23,7 +23,7 @@ export interface DialogTitleProps extends WithStyles<typeof styles> {
   onClose: () => void;
 }
 
-const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
+export const DialogTitleWithCloseButton = withStyles(styles)((props: DialogTitleProps) => {
   const { children, classes, onClose, ...other } = props;
   return (
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
@@ -36,5 +36,3 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
     </MuiDialogTitle>
   );
 });
-
-export default DialogTitle;

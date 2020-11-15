@@ -1,10 +1,10 @@
 import * as React from 'react';
-import Header from './Header';
-import MuteButton from './button/MuteButton';
-import ShareButton from './button/ShareButton';
-import PopoutButton from './button/PopoutButton';
+import { Header } from './Header';
+import { MuteButton } from './MuteButton';
+import { ShareButton } from './ShareButton';
+import { PopoutButton } from './PopoutButton';
 
-export default function RoomHeader() {
+export const RoomHeader: React.FC = () => {
   return (
     <Header>
       <MuteButton />
@@ -12,4 +12,4 @@ export default function RoomHeader() {
       <PopoutButton />
     </Header>
   );
-}
+};

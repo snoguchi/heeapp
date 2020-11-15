@@ -11,8 +11,8 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export default function FlexContainer({ children }) {
+export const FlexContainer: React.FC = ({ children }) => {
   const classes = useStyles();
 
   return <Box className={classes.root}>{children}</Box>;
-}
+};

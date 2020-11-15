@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IconButton } from '@material-ui/core';
 import { Launch } from '@material-ui/icons';
 
-export default function PopoutButton() {
+export const PopoutButton: React.FC = () => {
   function handleClick() {
     window.open(location.pathname, 'popout', 'resizable,scrollbars,width=300,height=650');
   }
@@ -16,4 +16,4 @@ export default function PopoutButton() {
       <Launch />
     </IconButton>
   );
-}
+};

@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function Header(props) {
+export const Header: React.FC = ({ children }) => {
   const classes = useStyles();
 
   return (
@@ -27,7 +27,7 @@ export default function Header(props) {
         </Link>
         <sup className={classes.beta}>BETA</sup>
       </Typography>
-      {props.children}
+      {children}
     </Toolbar>
   );
-}
+};

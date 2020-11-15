@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import App from './App';
-import Room from './component/Room';
+import { App } from './component/App';
+import { RoomPage } from './component/RoomPage';
 
 ReactDOM.render(
   <App>
-    <Room />
+    <RoomPage />
   </App>,
   document.getElementById('app')
 );

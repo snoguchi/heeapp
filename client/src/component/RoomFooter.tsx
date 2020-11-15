@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function RoomFooter() {
+export const RoomFooter: React.FC = () => {
   const room = useSelector((state) => state.room);
   const classes = useStyles();
 
@@ -25,4 +25,4 @@ export default function RoomFooter() {
       )}
     </Box>
   );
-}
+};

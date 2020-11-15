@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useSelector } from '../../store';
-import { mute, unmute } from '../../store/config';
+import { useSelector } from '../store';
+import { mute, unmute } from '../store/config';
 import { useDispatch } from 'react-redux';
 import { IconButton, Tooltip } from '@material-ui/core';
 import { VolumeOff, VolumeUp } from '@material-ui/icons';
@@ -15,7 +15,7 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export default function MuteButton() {
+export const MuteButton: React.FC = () => {
   const dispatch = useDispatch();
   const isMute = useSelector((state) => state.config.isMute);
   const classes = useStyles();
@@ -43,4 +43,4 @@ export default function MuteButton() {
       </IconButton>
     );
   }
-}
+};

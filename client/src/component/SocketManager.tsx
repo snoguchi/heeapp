@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { updateRoom, updateEmotion, raiseRoomError } from '../store/room';
 import api from '../lib/api';
 
-export default function SocketManager() {
+export const SocketManager: React.FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -20,4 +20,4 @@ export default function SocketManager() {
   }, []);
 
   return null;
-}
+};

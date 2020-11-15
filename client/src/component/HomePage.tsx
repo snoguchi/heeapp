@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { createRoom } from '../store/room';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Container, Typography } from '@material-ui/core';
-import Header from './Header';
+import { Header } from './Header';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function Home() {
+export const HomePage: React.FC = () => {
   const dispatch = useDispatch();
   const room = useSelector((state) => state.room);
   const classes = useStyles();
@@ -39,4 +39,4 @@ export default function Home() {
       </Box>
     </Container>
   );
-}
+};

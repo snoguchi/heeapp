@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { sendEmotion, removeEmotion } from '../store/room';
-import Tile from './Tile';
-import EmotionSoundPlayer from './EmotionSoundPlayer';
-import EmotionMeter from './EmotionMeter';
+import { Tile } from './Tile';
+import { EmotionSoundPlayer } from './EmotionSoundPlayer';
+import { EmotionMeter } from './EmotionMeter';
 import { Emotion } from 'shared/api-interfaces';
 
-export default function EmotionTile(emotion: Emotion) {
+export const EmotionTile: React.FC<Emotion> = (emotion: Emotion) => {
   const dispatch = useDispatch();
 
   function handleSendEmotion() {
@@ -23,4 +23,4 @@ export default function EmotionTile(emotion: Emotion) {
       {emotion.feverSoundUrl && <EmotionMeter {...emotion} />}
     </Tile>
   );
-}
+};

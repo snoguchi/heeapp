@@ -30,7 +30,15 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function TileItem({ children, onClick, onClose = null, content, label, primary = true }) {
+export interface TileProps {
+  onClick: () => void;
+  onClose?: () => void;
+  content: string | number;
+  label: string;
+  primary?: boolean;
+}
+
+export const Tile: React.FC<TileProps> = ({ children, onClick, onClose = null, content, label, primary = true }) => {
   const classes = useStyles();
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down('xs'));
@@ -80,4 +88,4 @@ export default function TileItem({ children, onClick, onClose = null, content, l
       {children}
     </Card>
   );
-}
+};

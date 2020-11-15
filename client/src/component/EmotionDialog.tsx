@@ -2,7 +2,16 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 
-export default function EmotionDialog({ title, open, onOK, onCancel, ...props }) {
+export interface EmotionDialogProps {
+  open: boolean;
+  title: string;
+  soundUrl?: string;
+  label?: string;
+  onOK: (param: { soundUrl: string; label: string }) => void;
+  onCancel: () => void;
+}
+
+export const EmotionDialog: React.FC<EmotionDialogProps> = ({ title, open, onOK, onCancel, ...props }) => {
   const [soundUrl, setSoundUrl] = useState<string>(props.soundUrl || '');
   const [label, setLabel] = useState<string>(props.label || '');
 
@@ -57,4 +66,4 @@ export default function EmotionDialog({ title, open, onOK, onCancel, ...props })
       </DialogActions>
     </Dialog>
   );
-}
+};

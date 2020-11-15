@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addEmotion } from '../store/room';
-import Tile from './Tile';
-import EmotionDialog from './EmotionDialog';
+import { Tile } from './Tile';
+import { EmotionDialog } from './EmotionDialog';
 
-export default function EmotionAdder() {
+export const EmotionAddTile: React.FC = () => {
   const dispatch = useDispatch();
   const [dialogVisible, setDialogVisible] = useState(false);
 
@@ -28,4 +28,4 @@ export default function EmotionAdder() {
       <EmotionDialog title='音声を追加する' open={dialogVisible} onOK={handleOK} onCancel={handleCancel} />
     </Tile>
   );
-}
+};

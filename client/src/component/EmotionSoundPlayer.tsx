@@ -3,7 +3,7 @@ import { useSelector } from '../store';
 import { Emotion } from 'shared/api-interfaces';
 import { Howl, Howler } from 'howler';
 
-export default function EmotionSoundPlayer(emotion: Emotion) {
+export const EmotionSoundPlayer: React.FC<Emotion> = (emotion: Emotion) => {
   const isMute = useSelector((state) => state.config.isMute);
 
   const sound = useRef(null);
@@ -43,4 +43,4 @@ export default function EmotionSoundPlayer(emotion: Emotion) {
   }, [isMute]);
 
   return null;
-}
+};

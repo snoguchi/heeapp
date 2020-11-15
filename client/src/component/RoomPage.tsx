@@ -4,14 +4,14 @@ import { useSelector } from '../store';
 import { useDispatch } from 'react-redux';
 import { joinRoom } from '../store/room';
 import { Alert } from '@material-ui/lab';
-import PageContainer from './container/PageContainer';
-import RoomHeader from './RoomHeader';
-import RoomFooter from './RoomFooter';
-import FlexContainer from './container/FlexContainer';
-import EmotionTile from './EmotionTile';
-import EmotionAddTile from './EmotionAddTile';
+import { PageContainer } from './PageContainer';
+import { RoomHeader } from './RoomHeader';
+import { RoomFooter } from './RoomFooter';
+import { FlexContainer } from './FlexContainer';
+import { EmotionTile } from './EmotionTile';
+import { EmotionAddTile } from './EmotionAddTile';
 
-export default function Room() {
+export const RoomPage: React.FC = () => {
   const room = useSelector((state) => state.room);
   const dispatch = useDispatch();
 
@@ -33,4 +33,4 @@ export default function Room() {
       </FlexContainer>
     </PageContainer>
   );
-}
+};

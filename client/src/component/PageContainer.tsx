@@ -15,7 +15,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function PageContainer({ children, header, footer }) {
+export interface PageContainerProps {
+  header: React.ReactElement;
+  footer: React.ReactElement;
+}
+
+export const PageContainer: React.FC<PageContainerProps> = ({ children, header, footer }) => {
   const classes = useStyles();
 
   return (
@@ -27,4 +32,4 @@ export default function PageContainer({ children, header, footer }) {
       {footer}
     </Container>
   );
-}
+};
