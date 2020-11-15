@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from '../store';
 import { mute, unmute } from '../store/config';
 import { useDispatch } from 'react-redux';
@@ -17,6 +18,7 @@ const useStyles = makeStyles(() =>
 
 export const MuteButton: React.FC = () => {
   const dispatch = useDispatch();
+  const [t] = useTranslation();
   const isMute = useSelector((state) => state.config.isMute);
   const classes = useStyles();
 
@@ -30,7 +32,7 @@ export const MuteButton: React.FC = () => {
 
   if (isMute) {
     return (
-      <Tooltip title='音声がミュートされています' classes={classes} arrow open={true}>
+      <Tooltip title={t('Audio_is_muted')} classes={classes} arrow open={true}>
         <IconButton color='inherit' aria-label='Unmute' onClick={handleUnmute}>
           <VolumeOff />
         </IconButton>

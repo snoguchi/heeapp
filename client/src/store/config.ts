@@ -1,7 +1,15 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+export type Lang = 'ja' | 'en';
+
+export interface Config {
+  isMute: boolean;
+  lang: Lang;
+}
 
 const initialState = {
   isMute: true,
+  lang: 'ja',
 };
 
 const slice = createSlice({
@@ -9,14 +17,17 @@ const slice = createSlice({
   initialState,
   reducers: {
     mute: (state) => {
-      return { ...state, isMute: true };
+      state.isMute = true;
     },
     unmute: (state) => {
-      return { ...state, isMute: false };
+      state.isMute = false;
+    },
+    setLang: (state: Config, action: PayloadAction<Lang>) => {
+      state.lang = action.payload;
     },
   },
 });
 
-export const { mute, unmute } = slice.actions;
+export const { mute, unmute, setLang } = slice.actions;
 
 export default slice.reducer;

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { IconButton, Snackbar } from '@material-ui/core';
 import { Box, Button, TextField, Dialog, DialogContent } from '@material-ui/core';
 import { Share } from '@material-ui/icons';
@@ -8,6 +9,11 @@ import * as QRCode from 'qrcode.react';
 import * as copyToClipboard from 'copy-to-clipboard';
 
 export const ShareButton: React.FC = () => {
+  if (window.name === 'popout') {
+    return null;
+  }
+
+  const [t] = useTranslation();
   const [barVisibility, setBarVisibility] = useState<boolean>(false);
   const [dialogVisibility, setDialogVisibility] = useState<boolean>(false);
 
@@ -35,7 +41,7 @@ export const ShareButton: React.FC = () => {
       </IconButton>
 
       <Dialog open={dialogVisibility} onClose={handleDialogClose}>
-        <DialogTitleWithCloseButton onClose={handleDialogClose}>共有</DialogTitleWithCloseButton>
+        <DialogTitleWithCloseButton onClose={handleDialogClose}>{t('Share')}</DialogTitleWithCloseButton>
         <DialogContent>
           <Box textAlign='center' padding={3}>
             <QRCode value={location.href} />
@@ -48,7 +54,7 @@ export const ShareButton: React.FC = () => {
               readOnly: true,
               endAdornment: (
                 <Button onClick={handleCopy} color='primary'>
-                  コピー
+                  {t('Copy')}
                 </Button>
               ),
             }}
@@ -60,7 +66,7 @@ export const ShareButton: React.FC = () => {
         open={barVisibility}
         autoHideDuration={6000}
         onClose={handleBarClose}
-        message='URLをクリップボードにコピーしました'
+        message={t('URL_is_copied_to_the_clipboard')}
       />
     </React.Fragment>
   );
