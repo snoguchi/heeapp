@@ -7,9 +7,11 @@ export interface Config {
   lang: Lang;
 }
 
+const defaultLanguage = (window.navigator.languages && window.navigator.languages[0]) || window.navigator.language;
+
 const initialState = {
   isMute: true,
-  lang: 'ja',
+  lang: defaultLanguage === 'ja' ? 'ja' : 'en',
 };
 
 const slice = createSlice({

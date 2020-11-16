@@ -10,7 +10,7 @@ export const LangButton: React.FC = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down('xs'));
-  const [t, i18n] = useTranslation();
+  const [t] = useTranslation();
   const lang = useSelector((state) => state.config.lang);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -20,7 +20,6 @@ export const LangButton: React.FC = () => {
 
   const selectLang = (lang: Lang) => {
     dispatch(setLang(lang));
-    i18n.changeLanguage(lang);
     setAnchorEl(null);
   };
 
