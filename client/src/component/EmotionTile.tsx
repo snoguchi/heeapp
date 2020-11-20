@@ -24,7 +24,7 @@ export const EmotionTile: React.FC<Emotion> = (emotion: Emotion) => {
       onClick={handleSendEmotion}
       //onClose={handleRemoveEmotion}
       content={emotion.count}
-      label={t(`emotion/${emotion.emotionId}`) || emotion.label}
+      label={t([`emotion/${emotion.emotionId}`, emotion.label])}
     >
       <EmotionSoundPlayer {...emotion} />
       {emotion.feverSoundUrl && <EmotionMeter {...emotion} />}
